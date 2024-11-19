@@ -36,7 +36,7 @@ strftime("%A %d de %B del %Y");
 //$fecha=strftime("%A %d de %B del %Y");
 $fecha = date("Y-m-d");
 //$fecha='2020-01-13';
-echo $hora = date("G:i");
+$hora = date("G:i");
 
 
 ?>
@@ -48,10 +48,8 @@ echo $hora = date("G:i");
     <?php
 
     if ($_POST['cliente_nuevo'] != "") {
-        echo $_POST["cliente_nuevo"];
-        $cliente_nuevo = mysqli_query($conexion2, "INSERT INTO `tareas` (`cliente`, `mecanico`, `tarea`, `fecha`, `hora`) VALUES ('$_POST[cliente_nuevo]', 'default', 'default', '$fecha', '$hora')");
-        
-                                                              //  "INSERT INTO `tareas` (`cliente`, `mecanico`, `tarea`, `fecha`, `hora`) VALUES ('test', 'default', 'default', '2023-02-07', '19:32:00')";
+
+        // $cliente_nuevo = mysqli_query($conexion2, "INSERT INTO `tareas` (`cliente`, `mecanico`, `tarea`, `fecha`, `hora`) VALUES ('$_POST[cliente_nuevo]', 'default', 'default', '$fecha', '$hora')");
     }
 
 
@@ -66,6 +64,8 @@ if ($_POST['intro_tarea'] != "") {
 */
 ?>
 
+
+<h3>Tareas</h3>
 <!---->
 <?php if ($_POST['tarea'] == "") { ?>
 
@@ -75,18 +75,48 @@ if ($_POST['intro_tarea'] != "") {
     </div>
     <br>
     <div style="overflow-y: scroll;height: 375px">
+
         <?php
         if ($_POST['a'] != '') {
-            $buscar_tareas = mysqli_query($conexion, "SELECT * FROM tareas ");
+
+            $buscar_clientes = mysqli_query($conexion2, "SELECT DISTINCT cliente FROM tareas");
+
+            while ($clientes = mysqli_fetch_array($buscar_clientes)) {
+
+
+                ?>
+                <h2><?php echo $clientes['cliente'] . "<hr>"; ?></h2>
+                <?php
+                $buscar_tareas = mysqli_query($conexion2, "SELECT * FROM tareas WHERE cliente ='$clientes[cliente]' ");
 
 
 
-            while ($tareas = mysqli_fetch_array($buscar_tareas)) {
+                while ($tareas = mysqli_fetch_array($buscar_tareas)) {
 
-                echo "<br>" . $tareas['tareas'] . "<hr>";
+
+                    ?>
+                    <table>
+
+
+                        <tr>
+                            <td><?php echo $tareas['tarea'] ?></td>
+
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" /></td>
+                            <td><button style="color:red;width:10px">X</button></td>
+
+                        </tr>
+                        <tr>
+                            <td><button>Aceptar</button></td>
+                        </tr>
+
+                    </table>
+                    <?php
+
+                }
 
             }
-
         }
 
 
@@ -100,8 +130,19 @@ if ($_POST['intro_tarea'] != "") {
 <!--añadir tarea-->
 <?php if ($_POST['tarea'] != "") { ?>
 
-    <h2>Cliente : <input type="text" placeholder="Cliente" onblur="cliente_nuevo()" id="cliente_nuevo" /></h2>
 
-    <p>Tarea</p><input type="text" style="overflow-wrap" /> <button style="width:20px;" onClick="otra_tarea(2)">+</button>
+    <h2>Cliente : <input type="text" placeholder="Cliente" onkeyup="buscar_cliente()" id="cliente_nuevo" value="<?php if ($_POST['cliente_nuevo'] != "") {
+        echo $_POST['cliente_nuevo'];
+    } ?>" /></h2>
+
+
+
+
+
+
+    <p>Tarea</p>
+    <div id="resultado_buscar_cliente" style="overflow-y: scroll;"></div>
+    <input type="text" style="overflow-wrap" id="intro_tarea" /> <button style="width:20px;"
+        onClick="otra_tarea(2)">+</button>
 
 <?php } ?>
